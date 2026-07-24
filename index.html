@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MLB Pitcher Strikeout Props -- 2026-07-24</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --gridline: #e1e0d9;
+    --border: rgba(11,11,11,0.10);
+    --blue: #2a78d6;
+    --blue-strong: #184f95;
+    --red: #e34948;
+    --red-strong: #b23231;
+    --amber: #c17d11;
+    --neutral-bg: #f0efec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19;
+      --page: #0d0d0d;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --gridline: #2c2c2a;
+      --border: rgba(255,255,255,0.10);
+      --blue: #3987e5;
+      --blue-strong: #86b6ef;
+      --red: #e66767;
+      --red-strong: #f3a3a2;
+      --amber: #e5a03d;
+      --neutral-bg: #262625;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --border: rgba(255,255,255,0.10);
+    --blue: #3987e5;
+    --blue-strong: #86b6ef;
+    --red: #e66767;
+    --red-strong: #f3a3a2;
+    --amber: #e5a03d;
+    --neutral-bg: #262625;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--text-primary);
+    padding: 24px;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  h1 { font-size: 1.3rem; margin: 0; }
+  .meta { color: var(--text-secondary); font-size: 0.85rem; }
+  .track-record {
+    color: var(--text-secondary); font-size: 0.82rem; padding: 8px 12px; margin-bottom: 14px;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 6px;
+  }
+  .track-record code { font-size: 0.78rem; }
+  .theme-toggle {
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
+    border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; cursor: pointer;
+  }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .search {
+    flex: 1 1 220px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+    background: var(--surface-1); color: var(--text-primary); font-size: 0.9rem;
+  }
+  .chip {
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-secondary);
+    border-radius: 999px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; display: flex; gap: 6px; align-items: center;
+  }
+  .chip.active { background: var(--text-primary); color: var(--surface-1); border-color: var(--text-primary); }
+  .chip-count { font-variant-numeric: tabular-nums; opacity: 0.7; }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { border-collapse: collapse; width: 100%; background: var(--surface-1); font-size: 0.85rem; }
+  thead th {
+    position: sticky; top: 0; background: var(--surface-1); text-align: left; padding: 10px 12px;
+    border-bottom: 1px solid var(--gridline); white-space: nowrap; cursor: pointer; color: var(--text-secondary);
+    font-weight: 600; user-select: none;
+  }
+  thead th:hover { color: var(--text-primary); }
+  .sort-arrow { display: inline-block; width: 10px; margin-left: 4px; }
+  th.sorted-asc .sort-arrow::after { content: "\25B2"; }
+  th.sorted-desc .sort-arrow::after { content: "\25BC"; }
+  tbody td {
+    padding: 8px 12px; border-bottom: 1px solid var(--gridline); white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody td.num { text-align: right; }
+  tbody tr:hover td { background: var(--neutral-bg); }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600;
+  }
+  .rec-strong-over { background: color-mix(in srgb, var(--blue) 22%, transparent); color: var(--blue-strong); }
+  .rec-lean-over { background: color-mix(in srgb, var(--blue) 10%, transparent); color: var(--blue); font-weight: 500; }
+  .rec-neutral { background: var(--neutral-bg); color: var(--text-muted); font-weight: 500; }
+  .rec-lean-under { background: color-mix(in srgb, var(--red) 10%, transparent); color: var(--red); font-weight: 500; }
+  .rec-strong-under { background: color-mix(in srgb, var(--red) 22%, transparent); color: var(--red-strong); }
+  .rec-noline { background: transparent; color: var(--text-muted); font-weight: 400; }
+  .rec-warning { background: color-mix(in srgb, var(--amber) 22%, transparent); color: var(--amber); font-weight: 600; }
+  .expand-col { width: 36px; }
+  .expand-toggle { width: 36px; text-align: center; padding: 0 !important; }
+  .expand-btn {
+    border: none; background: transparent; color: var(--text-muted); cursor: pointer;
+    font-size: 1rem; line-height: 1; width: 100%; height: 100%; min-height: 40px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .expand-btn:hover { background: var(--neutral-bg); color: var(--text-primary); }
+  tr.data-row.expandable { cursor: pointer; }
+  tr.data-row.expandable:hover td { background: var(--neutral-bg); }
+  tr.matchup-row td { padding: 10px 12px 14px 36px; background: var(--page); }
+  .matchup-table { border-collapse: collapse; font-size: 0.8rem; width: auto; min-width: 420px; }
+  .matchup-table th {
+    text-align: left; padding: 4px 10px; color: var(--text-muted); font-weight: 600;
+    border-bottom: 1px solid var(--gridline);
+  }
+  .matchup-table td { padding: 4px 10px; border-bottom: 1px solid var(--gridline); white-space: nowrap; }
+  .matchup-table td.num { text-align: right; }
+  .matchup-empty { color: var(--text-muted); font-size: 0.82rem; font-style: italic; }
+  .risk-high { background: color-mix(in srgb, var(--blue) 22%, transparent); color: var(--blue-strong); }
+  .risk-above { background: color-mix(in srgb, var(--blue) 10%, transparent); color: var(--blue); font-weight: 500; }
+  .risk-avg { background: var(--neutral-bg); color: var(--text-muted); font-weight: 500; }
+  .risk-below { background: color-mix(in srgb, var(--red) 10%, transparent); color: var(--red); font-weight: 500; }
+  .risk-low { background: color-mix(in srgb, var(--red) 22%, transparent); color: var(--red-strong); }
+  .risk-na { background: transparent; color: var(--text-muted); font-weight: 400; }
+  footer { margin-top: 14px; color: var(--text-muted); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MLB Pitcher Strikeout Prop Report -- 2026-07-24</h1>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="meta">Generated 2026-07-24 07:01 AM</span>
+      <button class="theme-toggle" id="themeToggle">Toggle theme</button>
+    </div>
+  </header>
+  <div class="track-record">Track record: <strong>1-2-0</strong> (W-L-Push), 33.3% win rate &middot; avg model error -0.25 K &middot; run <code>python grade.py</code> to update</div>
+  <div class="controls">
+    <input class="search" id="searchBox" type="text" placeholder="Search pitcher or team...">
+    <button class="chip" data-filter="All">All<span class="chip-count">28</span></button><button class="chip" data-filter="Strong Over">Strong Over<span class="chip-count">4</span></button><button class="chip" data-filter="Lean Over">Lean Over<span class="chip-count">3</span></button><button class="chip" data-filter="Neutral">Neutral<span class="chip-count">7</span></button><button class="chip" data-filter="Lean Under">Lean Under<span class="chip-count">8</span></button><button class="chip" data-filter="Strong Under">Strong Under<span class="chip-count">4</span></button>
+  </div>
+  <div class="table-scroll">
+    <table id="propsTable">
+      <thead><tr><th class="expand-col"></th><th data-col="0">Pitcher<span class="sort-arrow"></span></th><th data-col="1">Team<span class="sort-arrow"></span></th><th data-col="2">Opp<span class="sort-arrow"></span></th><th data-col="3">H/A<span class="sort-arrow"></span></th><th data-col="4">Weather<span class="sort-arrow"></span></th><th data-col="5">K%<span class="sort-arrow"></span></th><th data-col="6">SwStr%<span class="sort-arrow"></span></th><th data-col="7">ERA<span class="sort-arrow"></span></th><th data-col="8">FIP<span class="sort-arrow"></span></th><th data-col="9">Last5 K<span class="sort-arrow"></span></th><th data-col="10">Opp K%<span class="sort-arrow"></span></th><th data-col="11">Park<span class="sort-arrow"></span></th><th data-col="12">Proj K<span class="sort-arrow"></span></th><th data-col="13">Line<span class="sort-arrow"></span></th><th data-col="14">Book<span class="sort-arrow"></span></th><th data-col="15">Diff<span class="sort-arrow"></span></th><th data-col="16">Recommendation<span class="sort-arrow"></span></th></tr></thead>
+      <tbody>
+        <tr class="data-row" data-row-id="0" data-team="sea" data-recommendation="Strong Over" data-search="bryce miller sea tex"><td class="expand-toggle"></td><td class="text" data-value="bryce miller">Bryce Miller</td><td class="text" data-value="sea">SEA</td><td class="text" data-value="tex">TEX</td><td class="text" data-value="away">Away</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.294606">29.5%</td><td class="num" data-value="0.136761">13.7%</td><td class="num" data-value="2.270000">2.27</td><td class="num" data-value="3.226316">3.23</td><td class="num" data-value="7.000000">7.00</td><td class="num" data-value="0.224079">22.4%</td><td class="num" data-value="99.00">99</td><td class="num" data-value="7.660000">7.66</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="2.160000">2.16</td><td data-value="strong over"><span class="badge rec-strong-over">Strong Over</span></td></tr><tr class="data-row" data-row-id="1" data-team="cle" data-recommendation="Strong Over" data-search="joey cantillo cle tb"><td class="expand-toggle"></td><td class="text" data-value="joey cantillo">Joey Cantillo</td><td class="text" data-value="cle">CLE</td><td class="text" data-value="tb">TB</td><td class="text" data-value="away">Away</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.246154">24.6%</td><td class="num" data-value="0.136298">13.6%</td><td class="num" data-value="3.740000">3.74</td><td class="num" data-value="3.986792">3.99</td><td class="num" data-value="7.200000">7.20</td><td class="num" data-value="0.189364">18.9%</td><td class="num" data-value="102.00">102</td><td class="num" data-value="5.980000">5.98</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="1.480000">1.48</td><td data-value="strong over"><span class="badge rec-strong-over">Strong Over</span></td></tr><tr class="data-row" data-row-id="2" data-team="phi" data-recommendation="Strong Over" data-search="jesús luzardo phi nyy"><td class="expand-toggle"></td><td class="text" data-value="jesús luzardo">Jesús Luzardo</td><td class="text" data-value="phi">PHI</td><td class="text" data-value="nyy">NYY</td><td class="text" data-value="home">Home</td><td class="text" data-value="81°f mostly cloudy, 10 mph se">81°F Mostly Cloudy, 10 mph SE</td><td class="num" data-value="0.296066">29.6%</td><td class="num" data-value="0.135246">13.5%</td><td class="num" data-value="3.430000">3.43</td><td class="num" data-value="2.891908">2.89</td><td class="num" data-value="9.200000">9.20</td><td class="num" data-value="0.240682">24.1%</td><td class="num" data-value="99.00">99</td><td class="num" data-value="8.580000">8.58</td><td class="num" data-value="7.500000">7.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="1.080000">1.08</td><td data-value="strong over"><span class="badge rec-strong-over">Strong Over</span></td></tr><tr class="data-row" data-row-id="3" data-team="det" data-recommendation="Strong Over" data-search="tarik skubal det kc"><td class="expand-toggle"></td><td class="text" data-value="tarik skubal">Tarik Skubal</td><td class="text" data-value="det">DET</td><td class="text" data-value="kc">KC</td><td class="text" data-value="home">Home</td><td class="text" data-value="79°f mostly clear, 7 mph sse">79°F Mostly Clear, 7 mph SSE</td><td class="num" data-value="0.305296">30.5%</td><td class="num" data-value="0.155571">15.6%</td><td class="num" data-value="2.830000">2.83</td><td class="num" data-value="2.845968">2.85</td><td class="num" data-value="8.200000">8.20</td><td class="num" data-value="0.212956">21.3%</td><td class="num" data-value="101.00">101</td><td class="num" data-value="8.550000">8.55</td><td class="num" data-value="7.500000">7.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="1.050000">1.05</td><td data-value="strong over"><span class="badge rec-strong-over">Strong Over</span></td></tr><tr class="data-row" data-row-id="4" data-team="pit" data-recommendation="Lean Over" data-search="jared jones pit chc"><td class="expand-toggle"></td><td class="text" data-value="jared jones">Jared Jones</td><td class="text" data-value="pit">PIT</td><td class="text" data-value="chc">CHC</td><td class="text" data-value="home">Home</td><td class="text" data-value="79°f mostly cloudy, 6 mph se">79°F Mostly Cloudy, 6 mph SE</td><td class="num" data-value="0.294479">29.4%</td><td class="num" data-value="0.142857">14.3%</td><td class="num" data-value="4.050000">4.05</td><td class="num" data-value="3.225000">3.23</td><td class="num" data-value="6.000000">6.00</td><td class="num" data-value="0.215867">21.6%</td><td class="num" data-value="101.00">101</td><td class="num" data-value="6.240000">6.24</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="0.740000">0.74</td><td data-value="lean over"><span class="badge rec-lean-over">Lean Over</span></td></tr><tr class="data-row" data-row-id="5" data-team="bos" data-recommendation="Lean Over" data-search="patrick sandoval bos tor"><td class="expand-toggle"></td><td class="text" data-value="patrick sandoval">Patrick Sandoval</td><td class="text" data-value="bos">BOS</td><td class="text" data-value="tor">TOR</td><td class="text" data-value="home">Home</td><td class="text" data-value="77°f mostly clear, 8 mph se">77°F Mostly Clear, 8 mph SE</td><td class="num" data-value="0.238095">23.8%</td><td class="num" data-value="0.106383">10.6%</td><td class="num" data-value="4.820000">4.82</td><td class="num" data-value="2.992857">2.99</td><td class="num" data-value="5.000000">5.00</td><td class="num" data-value="0.196166">19.6%</td><td class="num" data-value="96.00">96</td><td class="num" data-value="4.920000">4.92</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="0.420000">0.42</td><td data-value="lean over"><span class="badge rec-lean-over">Lean Over</span></td></tr><tr class="data-row" data-row-id="6" data-team="nyy" data-recommendation="Lean Over" data-search="cam schlittler nyy phi"><td class="expand-toggle"></td><td class="text" data-value="cam schlittler">Cam Schlittler</td><td class="text" data-value="nyy">NYY</td><td class="text" data-value="phi">PHI</td><td class="text" data-value="away">Away</td><td class="text" data-value="81°f mostly cloudy, 10 mph se">81°F Mostly Cloudy, 10 mph SE</td><td class="num" data-value="0.296524">29.7%</td><td class="num" data-value="0.129110">12.9%</td><td class="num" data-value="2.200000">2.20</td><td class="num" data-value="2.717886">2.72</td><td class="num" data-value="7.200000">7.20</td><td class="num" data-value="0.237637">23.8%</td><td class="num" data-value="99.00">99</td><td class="num" data-value="7.900000">7.90</td><td class="num" data-value="7.500000">7.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="0.400000">0.40</td><td data-value="lean over"><span class="badge rec-lean-over">Lean Over</span></td></tr><tr class="data-row" data-row-id="7" data-team="cin" data-recommendation="Neutral" data-search="rhett lowder cin stl"><td class="expand-toggle"></td><td class="text" data-value="rhett lowder">Rhett Lowder</td><td class="text" data-value="cin">CIN</td><td class="text" data-value="stl">STL</td><td class="text" data-value="away">Away</td><td class="text" data-value="74°f slight chance showers and thunderstorms, 5 mph e">74°F Slight Chance Showers And Thunderstorms, 5 mph E</td><td class="num" data-value="0.182090">18.2%</td><td class="num" data-value="0.084840">8.5%</td><td class="num" data-value="5.750000">5.75</td><td class="num" data-value="4.613889">4.61</td><td class="num" data-value="5.400000">5.40</td><td class="num" data-value="0.204198">20.4%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="3.880000">3.88</td><td class="num" data-value="3.500000">3.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="0.380000">0.38</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="8" data-team="cws" data-recommendation="Neutral" data-search="davis martin cws hou"><td class="expand-toggle"></td><td class="text" data-value="davis martin">Davis Martin</td><td class="text" data-value="cws">CWS</td><td class="text" data-value="hou">HOU</td><td class="text" data-value="home">Home</td><td class="text" data-value="76°f mostly clear, 10 mph sse">76°F Mostly Clear, 10 mph SSE</td><td class="num" data-value="0.220455">22.0%</td><td class="num" data-value="0.113719">11.4%</td><td class="num" data-value="3.310000">3.31</td><td class="num" data-value="3.052830">3.05</td><td class="num" data-value="2.800000">2.80</td><td class="num" data-value="0.214760">21.5%</td><td class="num" data-value="99.00">99</td><td class="num" data-value="4.640000">4.64</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="0.140000">0.14</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="9" data-team="tor" data-recommendation="Neutral" data-search="trey yesavage tor bos"><td class="expand-toggle"></td><td class="text" data-value="trey yesavage">Trey Yesavage</td><td class="text" data-value="tor">TOR</td><td class="text" data-value="bos">BOS</td><td class="text" data-value="away">Away</td><td class="text" data-value="77°f mostly clear, 8 mph se">77°F Mostly Clear, 8 mph SE</td><td class="num" data-value="0.232836">23.3%</td><td class="num" data-value="0.134384">13.4%</td><td class="num" data-value="3.780000">3.78</td><td class="num" data-value="4.050617">4.05</td><td class="num" data-value="5.000000">5.00</td><td class="num" data-value="0.217633">21.8%</td><td class="num" data-value="96.00">96</td><td class="num" data-value="5.440000">5.44</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.060000">-0.06</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="10" data-team="min" data-recommendation="Neutral" data-search="zebby matthews min ath"><td class="expand-toggle"></td><td class="text" data-value="zebby matthews">Zebby Matthews</td><td class="text" data-value="min">MIN</td><td class="text" data-value="ath">ATH</td><td class="text" data-value="home">Home</td><td class="text" data-value="82°f partly cloudy, 15 mph ssw">82°F Partly Cloudy, 15 mph SSW</td><td class="num" data-value="0.195286">19.5%</td><td class="num" data-value="0.093301">9.3%</td><td class="num" data-value="5.400000">5.40</td><td class="num" data-value="5.214286">5.21</td><td class="num" data-value="4.800000">4.80</td><td class="num" data-value="0.226762">22.7%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="4.420000">4.42</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.080000">-0.08</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="11" data-team="mil" data-recommendation="Neutral" data-search="shane drohan mil col"><td class="expand-toggle"></td><td class="text" data-value="shane drohan">Shane Drohan</td><td class="text" data-value="mil">MIL</td><td class="text" data-value="col">COL</td><td class="text" data-value="home">Home</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.239748">24.0%</td><td class="num" data-value="0.120350">12.0%</td><td class="num" data-value="3.200000">3.20</td><td class="num" data-value="3.073684">3.07</td><td class="num" data-value="5.800000">5.80</td><td class="num" data-value="0.226263">22.6%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="5.420000">5.42</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.080000">-0.08</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="12" data-team="hou" data-recommendation="Neutral" data-search="spencer arrighetti hou cws"><td class="expand-toggle"></td><td class="text" data-value="spencer arrighetti">Spencer Arrighetti</td><td class="text" data-value="hou">HOU</td><td class="text" data-value="cws">CWS</td><td class="text" data-value="away">Away</td><td class="text" data-value="76°f mostly clear, 10 mph sse">76°F Mostly Clear, 10 mph SSE</td><td class="num" data-value="0.230769">23.1%</td><td class="num" data-value="0.100946">10.1%</td><td class="num" data-value="4.340000">4.34</td><td class="num" data-value="4.962069">4.96</td><td class="num" data-value="5.400000">5.40</td><td class="num" data-value="0.237173">23.7%</td><td class="num" data-value="99.00">99</td><td class="num" data-value="5.400000">5.40</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.100000">-0.10</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="13" data-team="tex" data-recommendation="Neutral" data-search="mackenzie gore tex sea"><td class="expand-toggle"></td><td class="text" data-value="mackenzie gore">MacKenzie Gore</td><td class="text" data-value="tex">TEX</td><td class="text" data-value="sea">SEA</td><td class="text" data-value="home">Home</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.256842">25.7%</td><td class="num" data-value="0.114674">11.5%</td><td class="num" data-value="4.800000">4.80</td><td class="num" data-value="3.813855">3.81</td><td class="num" data-value="6.000000">6.00</td><td class="num" data-value="0.229448">22.9%</td><td class="num" data-value="99.00">99</td><td class="num" data-value="6.170000">6.17</td><td class="num" data-value="6.500000">6.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.330000">-0.33</td><td data-value="neutral"><span class="badge rec-neutral">Neutral</span></td></tr><tr class="data-row" data-row-id="14" data-team="nym" data-recommendation="Lean Under" data-search="sean manaea nym lad"><td class="expand-toggle"></td><td class="text" data-value="sean manaea">Sean Manaea</td><td class="text" data-value="nym">NYM</td><td class="text" data-value="lad">LAD</td><td class="text" data-value="home">Home</td><td class="text" data-value="78°f partly cloudy, 10 mph se">78°F Partly Cloudy, 10 mph SE</td><td class="num" data-value="0.229462">22.9%</td><td class="num" data-value="0.101523">10.2%</td><td class="num" data-value="4.740000">4.74</td><td class="num" data-value="4.342678">4.34</td><td class="num" data-value="5.000000">5.00</td><td class="num" data-value="0.205957">20.6%</td><td class="num" data-value="102.00">102</td><td class="num" data-value="5.090000">5.09</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.410000">-0.41</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="15" data-team="chc" data-recommendation="Lean Under" data-search="matthew boyd chc pit"><td class="expand-toggle"></td><td class="text" data-value="matthew boyd">Matthew Boyd</td><td class="text" data-value="chc">CHC</td><td class="text" data-value="pit">PIT</td><td class="text" data-value="away">Away</td><td class="text" data-value="79°f mostly cloudy, 6 mph se">79°F Mostly Cloudy, 6 mph SE</td><td class="num" data-value="0.235023">23.5%</td><td class="num" data-value="0.121693">12.2%</td><td class="num" data-value="4.150000">4.15</td><td class="num" data-value="3.676923">3.68</td><td class="num" data-value="4.000000">4.00</td><td class="num" data-value="0.243390">24.3%</td><td class="num" data-value="101.00">101</td><td class="num" data-value="5.070000">5.07</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.430000">-0.43</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="16" data-team="lad" data-recommendation="Lean Under" data-search="roki sasaki lad nym"><td class="expand-toggle"></td><td class="text" data-value="roki sasaki">Roki Sasaki</td><td class="text" data-value="lad">LAD</td><td class="text" data-value="nym">NYM</td><td class="text" data-value="away">Away</td><td class="text" data-value="78°f partly cloudy, 10 mph se">78°F Partly Cloudy, 10 mph SE</td><td class="num" data-value="0.227273">22.7%</td><td class="num" data-value="0.127797">12.8%</td><td class="num" data-value="4.980000">4.98</td><td class="num" data-value="5.338462">5.34</td><td class="num" data-value="4.200000">4.20</td><td class="num" data-value="0.222596">22.3%</td><td class="num" data-value="102.00">102</td><td class="num" data-value="4.950000">4.95</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.550000">-0.55</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="17" data-team="atl" data-recommendation="Lean Under" data-search="grant holmes atl bal"><td class="expand-toggle"></td><td class="text" data-value="grant holmes">Grant Holmes</td><td class="text" data-value="atl">ATL</td><td class="text" data-value="bal">BAL</td><td class="text" data-value="away">Away</td><td class="text" data-value="81°f partly cloudy, 7 mph se">81°F Partly Cloudy, 7 mph SE</td><td class="num" data-value="0.195000">19.5%</td><td class="num" data-value="0.122717">12.3%</td><td class="num" data-value="3.700000">3.70</td><td class="num" data-value="4.951986">4.95</td><td class="num" data-value="3.000000">3.00</td><td class="num" data-value="0.242316">24.2%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="3.870000">3.87</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.630000">-0.63</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="18" data-team="stl" data-recommendation="Lean Under" data-search="dustin may stl cin"><td class="expand-toggle"></td><td class="text" data-value="dustin may">Dustin May</td><td class="text" data-value="stl">STL</td><td class="text" data-value="cin">CIN</td><td class="text" data-value="home">Home</td><td class="text" data-value="74°f slight chance showers and thunderstorms, 5 mph e">74°F Slight Chance Showers And Thunderstorms, 5 mph E</td><td class="num" data-value="0.229469">22.9%</td><td class="num" data-value="0.096792">9.7%</td><td class="num" data-value="4.780000">4.78</td><td class="num" data-value="3.253061">3.25</td><td class="num" data-value="4.000000">4.00</td><td class="num" data-value="0.245545">24.6%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="4.770000">4.77</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.730000">-0.73</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="19" data-team="sd" data-recommendation="Lean Under" data-search="germán márquez sd mia"><td class="expand-toggle"></td><td class="text" data-value="germán márquez">Germán Márquez</td><td class="text" data-value="sd">SD</td><td class="text" data-value="mia">MIA</td><td class="text" data-value="away">Away</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.150754">15.1%</td><td class="num" data-value="0.105410">10.5%</td><td class="num" data-value="5.240000">5.24</td><td class="num" data-value="6.502985">6.50</td><td class="num" data-value="2.800000">2.80</td><td class="num" data-value="0.217212">21.7%</td><td class="num" data-value="103.00">103</td><td class="num" data-value="2.760000">2.76</td><td class="num" data-value="3.500000">3.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.740000">-0.74</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="20" data-team="tb" data-recommendation="Lean Under" data-search="shane mcclanahan tb cle"><td class="expand-toggle"></td><td class="text" data-value="shane mcclanahan">Shane McClanahan</td><td class="text" data-value="tb">TB</td><td class="text" data-value="cle">CLE</td><td class="text" data-value="home">Home</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.224868">22.5%</td><td class="num" data-value="0.121062">12.1%</td><td class="num" data-value="3.160000">3.16</td><td class="num" data-value="3.352747">3.35</td><td class="num" data-value="3.800000">3.80</td><td class="num" data-value="0.223279">22.3%</td><td class="num" data-value="102.00">102</td><td class="num" data-value="4.620000">4.62</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.880000">-0.88</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="21" data-team="sf" data-recommendation="Lean Under" data-search="logan webb sf laa"><td class="expand-toggle"></td><td class="text" data-value="logan webb">Logan Webb</td><td class="text" data-value="sf">SF</td><td class="text" data-value="laa">LAA</td><td class="text" data-value="home">Home</td><td class="text" data-value="63°f clear, 12 mph w">63°F Clear, 12 mph W</td><td class="num" data-value="0.194064">19.4%</td><td class="num" data-value="0.091385">9.1%</td><td class="num" data-value="3.870000">3.87</td><td class="num" data-value="3.529907">3.53</td><td class="num" data-value="4.000000">4.00</td><td class="num" data-value="0.251674">25.2%</td><td class="num" data-value="104.00">104</td><td class="num" data-value="4.520000">4.52</td><td class="num" data-value="5.500000">5.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-0.980000">-0.98</td><td data-value="lean under"><span class="badge rec-lean-under">Lean Under</span></td></tr><tr class="data-row" data-row-id="22" data-team="az" data-recommendation="Strong Under" data-search="eduardo rodriguez az wsh"><td class="expand-toggle"></td><td class="text" data-value="eduardo rodriguez">Eduardo Rodriguez</td><td class="text" data-value="az">AZ</td><td class="text" data-value="wsh">WSH</td><td class="text" data-value="away">Away</td><td class="text" data-value="79°f mostly cloudy, 7 mph e">79°F Mostly Cloudy, 7 mph E</td><td class="num" data-value="0.171548">17.2%</td><td class="num" data-value="0.078125">7.8%</td><td class="num" data-value="2.620000">2.62</td><td class="num" data-value="4.085714">4.09</td><td class="num" data-value="3.400000">3.40</td><td class="num" data-value="0.215092">21.5%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="3.470000">3.47</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-1.030000">-1.03</td><td data-value="strong under"><span class="badge rec-strong-under">Strong Under</span></td></tr><tr class="data-row" data-row-id="23" data-team="col" data-recommendation="Strong Under" data-search="tomoyuki sugano col mil"><td class="expand-toggle"></td><td class="text" data-value="tomoyuki sugano">Tomoyuki Sugano</td><td class="text" data-value="col">COL</td><td class="text" data-value="mil">MIL</td><td class="text" data-value="away">Away</td><td class="text" data-value="dome/retractable">Dome/Retractable</td><td class="num" data-value="0.133508">13.4%</td><td class="num" data-value="0.077362">7.7%</td><td class="num" data-value="4.760000">4.76</td><td class="num" data-value="5.383088">5.38</td><td class="num" data-value="3.000000">3.00</td><td class="num" data-value="0.211548">21.2%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="2.420000">2.42</td><td class="num" data-value="3.500000">3.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-1.080000">-1.08</td><td data-value="strong under"><span class="badge rec-strong-under">Strong Under</span></td></tr><tr class="data-row" data-row-id="24" data-team="ath" data-recommendation="Strong Under" data-search="jacob lopez ath min"><td class="expand-toggle"></td><td class="text" data-value="jacob lopez">Jacob Lopez</td><td class="text" data-value="ath">ATH</td><td class="text" data-value="min">MIN</td><td class="text" data-value="away">Away</td><td class="text" data-value="82°f partly cloudy, 15 mph ssw">82°F Partly Cloudy, 15 mph SSW</td><td class="num" data-value="0.174377">17.4%</td><td class="num" data-value="0.092025">9.2%</td><td class="num" data-value="6.640000">6.64</td><td class="num" data-value="5.764804">5.76</td><td class="num" data-value="2.800000">2.80</td><td class="num" data-value="0.217160">21.7%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="2.890000">2.89</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-1.610000">-1.61</td><td data-value="strong under"><span class="badge rec-strong-under">Strong Under</span></td></tr><tr class="data-row" data-row-id="25" data-team="laa" data-recommendation="Strong Under" data-search="grayson rodriguez laa sf"><td class="expand-toggle"></td><td class="text" data-value="grayson rodriguez">Grayson Rodriguez</td><td class="text" data-value="laa">LAA</td><td class="text" data-value="sf">SF</td><td class="text" data-value="away">Away</td><td class="text" data-value="63°f clear, 12 mph w">63°F Clear, 12 mph W</td><td class="num" data-value="0.160714">16.1%</td><td class="num" data-value="0.093750">9.4%</td><td class="num" data-value="8.230000">8.23</td><td class="num" data-value="5.214286">5.21</td><td class="num" data-value="2.600000">2.60</td><td class="num" data-value="0.210471">21.0%</td><td class="num" data-value="104.00">104</td><td class="num" data-value="2.710000">2.71</td><td class="num" data-value="4.500000">4.50</td><td class="text" data-value="fanduel">FanDuel</td><td class="num" data-value="-1.790000">-1.79</td><td data-value="strong under"><span class="badge rec-strong-under">Strong Under</span></td></tr><tr class="data-row" data-row-id="26" data-team="kc" data-recommendation="no line" data-search="beck way kc det"><td class="expand-toggle"></td><td class="text" data-value="beck way">Beck Way</td><td class="text" data-value="kc">KC</td><td class="text" data-value="det">DET</td><td class="text" data-value="away">Away</td><td class="text" data-value="79°f mostly clear, 7 mph sse">79°F Mostly Clear, 7 mph SSE</td><td class="num" data-value="0.214286">21.4%</td><td class="num" data-value="0.110831">11.1%</td><td class="num" data-value="3.220000">3.22</td><td class="num" data-value="4.891045">4.89</td><td class="num" data-value="">-</td><td class="num" data-value="0.232240">23.2%</td><td class="num" data-value="101.00">101</td><td class="num" data-value="4.750000">4.75</td><td class="num" data-value="">-</td><td class="text" data-value="">-</td><td class="num" data-value="">-</td><td data-value="no line"><span class="badge rec-noline">no line</span></td></tr><tr class="data-row" data-row-id="27" data-team="wsh" data-recommendation="no line" data-search="carson palmquist wsh az"><td class="expand-toggle"></td><td class="text" data-value="carson palmquist">Carson Palmquist</td><td class="text" data-value="wsh">WSH</td><td class="text" data-value="az">AZ</td><td class="text" data-value="home">Home</td><td class="text" data-value="79°f mostly cloudy, 7 mph e">79°F Mostly Cloudy, 7 mph E</td><td class="num" data-value="0.259259">25.9%</td><td class="num" data-value="0.108527">10.9%</td><td class="num" data-value="8.740000">8.74</td><td class="num" data-value="3.364706">3.36</td><td class="num" data-value="3.000000">3.00</td><td class="num" data-value="0.195286">19.5%</td><td class="num" data-value="100.00">100</td><td class="num" data-value="3.050000">3.05</td><td class="num" data-value="">-</td><td class="text" data-value="">-</td><td class="num" data-value="">-</td><td data-value="no line"><span class="badge rec-noline">no line</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <footer>Recommendation is diff-based (projected K minus book line): Strong Over &ge; +1.0, Lean Over &ge; +0.4, Neutral within &plusmn;0.4, Lean Under &le; -0.4, Strong Under &le; -1.0. Regenerate with <code>python main.py</code>.</footer>
+</div>
+<script>
+(function() {
+  var table = document.getElementById('propsTable');
+  var tbody = table.querySelector('tbody');
+  var headers = table.querySelectorAll('thead th');
+  var sortState = { col: null, asc: true };
+
+  function getMatchupRow(dataRow) {
+    return tbody.querySelector('tr.matchup-row[data-row-id="' + dataRow.getAttribute('data-row-id') + '"]');
+  }
+
+  headers.forEach(function(th, idx) {
+    if (idx === 0) return; // expand-toggle column isn't sortable
+    th.addEventListener('click', function() {
+      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr.data-row'));
+      var asc = sortState.col === idx ? !sortState.asc : true;
+      rows.sort(function(a, b) {
+        var av = a.children[idx].getAttribute('data-value');
+        var bv = b.children[idx].getAttribute('data-value');
+        var an = parseFloat(av), bn = parseFloat(bv);
+        var cmp;
+        if (!isNaN(an) && !isNaN(bn) && av !== '' && bv !== '') {
+          cmp = an - bn;
+        } else {
+          cmp = av.localeCompare(bv);
+        }
+        return asc ? cmp : -cmp;
+      });
+      rows.forEach(function(r) {
+        tbody.appendChild(r);
+        var matchupRow = getMatchupRow(r);
+        if (matchupRow) { tbody.appendChild(matchupRow); }
+      });
+      headers.forEach(function(h) { h.classList.remove('sorted-asc', 'sorted-desc'); });
+      th.classList.add(asc ? 'sorted-asc' : 'sorted-desc');
+      sortState = { col: idx, asc: asc };
+    });
+  });
+
+  var activeFilter = 'All';
+  var searchTerm = '';
+
+  function applyFilters() {
+    var rows = tbody.querySelectorAll('tr.data-row');
+    rows.forEach(function(r) {
+      var matchesFilter = activeFilter === 'All' || r.getAttribute('data-recommendation') === activeFilter;
+      var matchesSearch = searchTerm === '' || r.getAttribute('data-search').indexOf(searchTerm) !== -1;
+      var visible = matchesFilter && matchesSearch;
+      r.style.display = visible ? '' : 'none';
+      var matchupRow = getMatchupRow(r);
+      if (matchupRow && !visible) {
+        matchupRow.style.display = 'none';
+        var btn = r.querySelector('.expand-btn');
+        if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.innerHTML = '&#9656;'; }
+      }
+    });
+  }
+
+  document.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeFilter = chip.getAttribute('data-filter');
+      applyFilters();
+    });
+  });
+  document.querySelector('.chip[data-filter="All"]').classList.add('active');
+
+  document.getElementById('searchBox').addEventListener('input', function(e) {
+    searchTerm = e.target.value.trim().toLowerCase();
+    applyFilters();
+  });
+
+  document.querySelectorAll('tr.data-row.expandable').forEach(function(dataRow) {
+    var matchupRow = getMatchupRow(dataRow);
+    if (!matchupRow) return;
+    dataRow.addEventListener('click', function() {
+      var btn = dataRow.querySelector('.expand-btn');
+      var expanded = matchupRow.style.display !== 'none';
+      matchupRow.style.display = expanded ? 'none' : '';
+      if (btn) {
+        btn.setAttribute('aria-expanded', String(!expanded));
+        btn.innerHTML = expanded ? '&#9656;' : '&#9662;';
+      }
+    });
+  });
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var root = document.documentElement;
+    var attr = root.getAttribute('data-theme');
+    var currentlyDark = attr === 'dark' || (attr !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', currentlyDark ? 'light' : 'dark');
+  });
+})();
+</script>
+</body>
+</html>
