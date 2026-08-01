@@ -1,0 +1,22 @@
+# Python
+backend/.venv/
+backend/**/__pycache__/
+*.pyc
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/dist-electron/
+frontend/release/
+node_modules/
+
+# Model weights (downloaded, not committed)
+models/weights/
+
+# Runtime data
+backend/.sessions/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,17 @@
+{
+  "name": "ai-dj-edit-studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop app that turns a song you have rights to into professional DJ edits.",
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "dev:backend": "cd backend && . .venv/bin/activate && uvicorn app.main:app --reload --port 8742",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "build:frontend": "cd frontend && npm run build",
+    "package": "cd frontend && npm run electron:build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

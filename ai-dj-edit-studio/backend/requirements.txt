@@ -1,0 +1,35 @@
+# --- Web server / IPC with the Electron frontend ---
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+pydantic==2.9.2
+websockets==13.1
+
+# --- Audio I/O & format handling (MP3/WAV/FLAC/AIFF) ---
+soundfile==0.12.1
+pydub==0.25.1
+audioread==3.0.1
+
+# --- Analysis: BPM, key, structure, energy ---
+librosa==0.10.2.post1
+numpy==1.26.4
+scipy==1.13.1
+scikit-learn==1.5.2
+madmom==0.16.1        # downbeat/meter tracking (falls back gracefully if build fails, see README)
+
+# --- Stem separation ---
+demucs==4.0.1
+torch==2.3.1
+torchaudio==2.3.1
+
+# --- Time-stretch / pitch-shift ---
+pyrubberband==0.3.0    # requires the `rubberband-cli` system binary, see README
+
+# --- Effects (filters, reverb, delay) ---
+pedalboard==0.9.14
+
+# --- Loudness normalization for export ---
+pyloudnorm==0.1.1
+
+# --- Utilities ---
+tqdm==4.66.5
